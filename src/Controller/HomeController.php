@@ -2,9 +2,6 @@
 
 namespace App\Controller;
 
-use App\Entity\Album;
-use App\Entity\Media;
-use App\Entity\User;
 use App\Repository\AlbumRepository;
 use App\Repository\MediaRepository;
 use App\Repository\UserRepository;
@@ -15,17 +12,13 @@ class HomeController extends AbstractController
 {
     public function __construct(private UserRepository $userRepo, private AlbumRepository $albumRepo, private MediaRepository $mediaRepo) {}
 
-    /**
-     * @Route("/", name="home")
-     */
+    #[Route('/', name: 'home')]
     public function home()
     {
         return $this->render('front/home.html.twig');
     }
 
-    /**
-     * @Route("/guests", name="guests")
-     */
+    #[Route('/guests', name: 'guests')]
     public function guests()
     {
         $guests = $this->userRepo->findBy(['admin' => false]);
@@ -34,9 +27,7 @@ class HomeController extends AbstractController
         ]);
     }
 
-    /**
-     * @Route("/guest/{id}", name="guest")
-     */
+    #[Route('/guest/{id}', name: 'guest')]
     public function guest(int $id)
     {
         $guest = $this->userRepo->find($id);
@@ -45,9 +36,7 @@ class HomeController extends AbstractController
         ]);
     }
 
-    /**
-     * @Route("/portfolio/{id}", name="portfolio")
-     */
+    #[Route('/portfolio/{id}', name: 'portfolio')]
     public function portfolio(?int $id = null)
     {
         $albums = $this->albumRepo->findAll();
@@ -64,9 +53,7 @@ class HomeController extends AbstractController
         ]);
     }
 
-    /**
-     * @Route("/about", name="about")
-     */
+    #[Route('/about', name: 'about')]
     public function about()
     {
         return $this->render('front/about.html.twig');
