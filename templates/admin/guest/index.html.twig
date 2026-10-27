@@ -1,0 +1,32 @@
+{% extends 'admin.html.twig' %}
+
+{% block admin %}
+    <div class="d-flex justify-content-between align-items-center">
+        <h1>Invités</h1>
+        <a href="{{ path('admin_guest_add') }}" class="btn btn-primary">Ajouter</a>
+    </div>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Nom</th>
+                <th>Email</th>
+                <th>Statut</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for guest in guests %}
+                {% set blocked = guest.isBlocked %}
+                <tr>
+                    <td>{{ guest.name }}</td>
+                    <td>{{ guest.email }}</td>
+                    <td>{{ blocked ? 'Bloqué' : 'Actif' }}</td>
+                    <td>
+                        <a href="{{ path(blocked ? 'admin_guest_unblock' : 'admin_guest_block', {id : guest.id}) }}" class="btn {{ blocked ? 'btn-secondary' : 'btn-dark' }}">{{ blocked ? 'Débloquer' : 'Bloquer' }}</a>
+                        <a href="{{ path('admin_guest_delete', {id: guest.id}) }}" class="btn btn-danger">Supprimer</a>
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}
