@@ -21,7 +21,7 @@ class HomeController extends AbstractController
     #[Route('/guests', name: 'guests')]
     public function guests()
     {
-        $guests = $this->userRepo->findGuests();
+        $guests = $this->userRepo->findActiveGuests();
         return $this->render('front/guests.html.twig', [
             'guests' => $guests
         ]);
@@ -31,6 +31,10 @@ class HomeController extends AbstractController
     public function guest(int $id)
     {
         $guest = $this->userRepo->find($id);
+        if (!$guest || $guest->isBlocked()) {
+            return $this->redirectToRoute('guests');
+        }
+
         return $this->render('front/guest.html.twig', [
             'guest' => $guest
         ]);

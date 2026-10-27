@@ -69,7 +69,6 @@ class MediaController extends AbstractController
         $media = $this->repo->find($id);
         $this->em->remove($media);
         $this->em->flush();
-        unlink($media->getPath());
 
         return $this->redirectToRoute('admin_media_index');
     }
