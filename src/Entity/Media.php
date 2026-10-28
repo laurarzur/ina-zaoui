@@ -25,6 +25,7 @@ class Media
     private string $path;
 
     #[ORM\Column]
+    #[Assert\NotBlank()]
     private string $title;
 
     #[Assert\Image(maxSize: "2M", maxSizeMessage: "L'image ne doit pas dépasser 2Mo", mimeTypes: ["image/jpeg", "image/png", "image/webp"], mimeTypesMessage: "Formats acceptés : jpeg, png, webp")]
