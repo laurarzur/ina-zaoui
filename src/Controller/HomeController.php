@@ -2,24 +2,35 @@
 
 namespace App\Controller;
 
+use App\Entity\Album;
+use App\Entity\User;
 use App\Repository\AlbumRepository;
 use App\Repository\MediaRepository;
 use App\Repository\UserRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
 class HomeController extends AbstractController
 {
     public function __construct(private UserRepository $userRepo, private AlbumRepository $albumRepo, private MediaRepository $mediaRepo) {}
 
+    /**
+     * Cette méthode permet d'afficher la page d'accueil
+     * @return Response
+     */
     #[Route('/', name: 'home')]
-    public function home()
+    public function home(): Response
     {
         return $this->render('front/home.html.twig');
     }
 
+    /**
+     * Cette méthode permet d'afficher la liste des invités non bloqués
+     * @return Response
+     */
     #[Route('/guests', name: 'guests')]
-    public function guests()
+    public function guests(): Response
     {
         $guests = $this->userRepo->findActiveGuests();
         return $this->render('front/guests.html.twig', [
@@ -27,11 +38,15 @@ class HomeController extends AbstractController
         ]);
     }
 
+    /**
+     * Cette méthode permet d'afficher la page d'un invité
+     * @param User $guest
+     * @return Response
+     */
     #[Route('/guest/{id}', name: 'guest')]
-    public function guest(int $id)
+    public function guest(User $guest): Response
     {
-        $guest = $this->userRepo->find($id);
-        if (!$guest || $guest->isBlocked()) {
+        if ($guest->isBlocked()) {
             return $this->redirectToRoute('guests');
         }
 
@@ -40,16 +55,21 @@ class HomeController extends AbstractController
         ]);
     }
 
-    #[Route('/portfolio/{id}', name: 'portfolio')]
-    public function portfolio(?int $id = null)
+    /**
+     * Cette méthode permet d'afficher le portfolio d'Ina Zaoui 
+     * @param ?Album $album
+     * @return Response
+     */
+    #[Route('/portfolio/{id}', name: 'portfolio', defaults: ['id' => null])]
+    public function portfolio(?Album $album = null): Response
     {
         $albums = $this->albumRepo->findAll();
-        $album = $id ? $this->albumRepo->find($id) : null;
-        $user = $this->userRepo->findAdmin();
 
+        // Si un album est demandé, les médias de cet album sont récupérés 
+        // Sinon, ce sont tous les médias de l'admin
         $medias = $album
             ? $this->mediaRepo->findByAlbum($album)
-            : $this->mediaRepo->findByUser($user);
+            : $this->mediaRepo->findByUser($this->userRepo->findAdmin());
         return $this->render('front/portfolio.html.twig', [
             'albums' => $albums,
             'album' => $album,
@@ -57,8 +77,12 @@ class HomeController extends AbstractController
         ]);
     }
 
+    /**
+     * Cette méthode permet d'afficher la page "Qui suis-je ?"
+     * @return Response
+     */
     #[Route('/about', name: 'about')]
-    public function about()
+    public function about(): Response
     {
         return $this->render('front/about.html.twig');
     }

@@ -16,6 +16,10 @@ final class GuestController extends AbstractController
 {
     public function __construct(private UserRepository $repo, private EntityManagerInterface $em) {}
 
+    /**
+     * Cette méthode permet d'afficher la liste des invités sur le Back Office
+     * @return Response
+     */
     #[Route('/admin/guest', name: 'admin_guest_index')]
     public function index(): Response
     {
@@ -26,8 +30,14 @@ final class GuestController extends AbstractController
         ]);
     }
 
+    /**
+     * Cette méthode permet de créer un invité
+     * @param Request $request 
+     * @param UserPasswordHasherInterface $hasher
+     * @return Response
+     */
     #[Route('/admin/guest/add', name: 'admin_guest_add')]
-    public function add(Request $request, UserPasswordHasherInterface $hasher)
+    public function add(Request $request, UserPasswordHasherInterface $hasher): Response
     {
         $guest = new User();
         $form = $this->createForm(GuestType::class, $guest);
@@ -47,35 +57,53 @@ final class GuestController extends AbstractController
         ]);
     }
 
+    /**
+     * Cette méthode permet de modifier le statut (bloqué ou non) d'un invité 
+     * @param bool $value
+     * @param User $guest
+     * @return Response
+     */
     private function setGuestStatus(bool $value, User $guest): Response
     {
-        if ($guest) {
-            $guest->setIsBlocked($value);
-            $this->em->persist($guest);
-            $this->em->flush();
-        }
+        $guest->setIsBlocked($value);
+        $this->em->persist($guest);
+        $this->em->flush();
+
         return $this->redirectToRoute('admin_guest_index');
     }
 
+    /**
+     * Cette méthode permet de bloquer un invité 
+     * @param User $guest
+     * @return Response
+     */
     #[Route('/admin/guest/block/{id}', name: 'admin_guest_block')]
     public function block(User $guest): Response
     {
         return $this->setGuestStatus(true, $guest);
     }
 
+    /**
+     * Cette méthode permet de débloquer un invité 
+     * @param User $guest
+     * @return Response
+     */
     #[Route('/admin/guest/unblock/{id}', name: 'admin_guest_unblock')]
-    public function unblock(User $guest)
+    public function unblock(User $guest): Response
     {
         return $this->setGuestStatus(false, $guest);
     }
 
+    /**
+     * Cette méthode permet de supprimer un invité 
+     * @param User $guest
+     * @return Response
+     */
     #[Route('/admin/guest/delete/{id}', name: 'admin_guest_delete')]
     public function delete(User $guest): Response
     {
-        if ($guest) {
-            $this->em->remove($guest);
-            $this->em->flush();
-        }
+        $this->em->remove($guest);
+        $this->em->flush();
         return $this->redirectToRoute('admin_guest_index');
     }
 }
