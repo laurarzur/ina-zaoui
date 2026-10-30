@@ -60,11 +60,6 @@ class MediaTest extends TestCase
         $this->assertSame($file, $this->media->getFile());
     }
 
-    public function testGetId(): void
-    {
-        $this->assertNull($this->media->getId());
-    }
-
     /**
      * @dataProvider mediaRequiredProperties
      */

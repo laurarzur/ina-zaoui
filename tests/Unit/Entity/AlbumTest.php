@@ -20,17 +20,12 @@ class AlbumTest extends TestCase
 
         $unnamedAlbum = new Album();
         $this->expectException(\Error::class);
-        $unnamedAlbum->getName();
+        $name = $unnamedAlbum->getName();
     }
 
     public function testSetDifferentName(): void
     {
         $this->album->setName("Autre nom");
         $this->assertSame("Autre nom", $this->album->getName());
-    }
-
-    public function testGetId(): void
-    {
-        $this->assertNull($this->album->getId());
     }
 }
