@@ -60,9 +60,12 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
     public function findActiveGuests(): array
     {
         return $this->createQueryBuilder('u')
+            ->select('u AS guest', 'COUNT(m.id) AS mediaCount')
+            ->leftJoin('u.medias', 'm')
             ->andWhere('u.roles NOT LIKE :role')
             ->andWhere('u.isBlocked = 0')
             ->setParameter('role', '%"ROLE_ADMIN%')
+            ->groupBy('u.id')
             ->orderBy('u.id', 'ASC')
             ->getQuery()
             ->getResult()
