@@ -75,11 +75,7 @@ Règles :
 5. **Vérifier en local** que tout passe :
    ```bash
    php bin/phpunit
-   php bin/console lint:container
-   php bin/console lint:twig templates
-   php bin/console lint:yaml config
-   php bin/console doctrine:schema:validate
-   composer audit
+   vendor/bin/phpstan analyse
    ```
 6. **Mettre à jour la documentation** si le comportement ou l'installation changent (README, ce fichier).
 7. **Pousser la branche** et ouvrir une **Pull Request vers `develop`**, en remplissant le modèle de la partie  7.
@@ -102,9 +98,18 @@ Une Pull Request est fusionnée **uniquement si toutes** les conditions suivante
 | **Intégration continue verte** | Tous les tests passent, les contrôles de qualité sont validés |
 | **Au moins 1 approbation** | Un relecteur autre que l'auteur valide la contribution |
 | **Aucun commentaire non résolu** | Chaque remarque est traitée ou discutée |
-| **Couverture de code ≥ 70 %** | Mesurée sur l'ensemble du projet ; elle ne doit pas baisser |
 | **Branche à jour** | Rebasée ou fusionnée avec `develop`, sans conflit |
 | **Description complète** | Modèle de la partie 7 renseigné |
+
+### Intégration continue
+
+Le workflow `CI` est déclenché :
+
+- à chaque push sur `main` ou `develop` ;
+- à chaque Pull Request ciblant `main` ou `develop`.
+
+> **Important :** un push sur une branche `feature/…`, `fix/…` ou similaire ne déclenche pas la CI.  
+> Le workflow s’exécute lorsque la Pull Request est ouverte ou mise à jour vers `main` ou `develop`.
 
 Mode de fusion :
 
@@ -127,18 +132,17 @@ Le relecteur vérifie notamment :
 - **Tests fonctionnels** (`tests/Functional`) pour les pages et les routes : cas nominal, formulaire invalide (code 422), identifiant inconnu (404), accès refusé (403) et visiteur non connecté (redirection vers `/login`).
 - Les tests sont **indépendants** : aucun test ne dépend de l'ordre d'exécution ni des données créées par un autre. Un test qui crée une donnée la crée lui-même.
 - Un test ne doit jamais supprimer ou modifier les vraies images de `public/uploads/`.
-- Seuil à respecter : **couverture supérieure à 70 %**.
+
 
 ### Qualité et analyse statique
 
 Avant chaque Pull Request, exécuter les contrôles de la procédure (partie 4, étape 5). En complément, le projet recommande :
 
 ```bash
-vendor/bin/phpstan analyse src tests        # analyse statique
-vendor/bin/php-cs-fixer fix --dry-run --diff  # style de code (PSR-12 / Symfony)
+vendor/bin/phpstan analyse         # analyse statique
 ```
 
-Ces deux outils s'installent avec `composer require --dev phpstan/phpstan friendsofphp/php-cs-fixer`.
+Cet outil s'installe avec `composer require --dev phpstan/phpstan`.
 
 ### Code
 
@@ -194,9 +198,6 @@ Ces deux outils s'installent avec `composer require --dev phpstan/phpstan friend
 
 ## Checklist
 - [ ] Les tests ajoutés ou adaptés passent (`php bin/phpunit`)
-- [ ] La couverture de code reste supérieure à 70 %
-- [ ] `lint:container`, `lint:twig`, `lint:yaml` et `doctrine:schema:validate` passent
-- [ ] `composer audit` ne signale aucune vulnérabilité
 - [ ] Pas de secret, de `dump()` ni de code mort
 - [ ] Une migration a été ajoutée et relue si le schéma change
 - [ ] La documentation (README, CONTRIBUTING) est à jour

@@ -68,8 +68,8 @@ class HomeController extends AbstractController
         // Si un album est demandé, les médias de cet album sont récupérés 
         // Sinon, ce sont tous les médias de l'admin
         $medias = $album
-            ? $this->mediaRepo->findByAlbum($album)
-            : $this->mediaRepo->findByUser($this->userRepo->findAdmin());
+            ? $this->mediaRepo->findBy(['album' => $album])
+            : $this->mediaRepo->findBy(['user' => $this->userRepo->findAdmin()]);
         return $this->render('front/portfolio.html.twig', [
             'albums' => $albums,
             'album' => $album,

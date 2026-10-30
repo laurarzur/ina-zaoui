@@ -79,10 +79,8 @@ class AlbumController extends AbstractController
     #[Route('/admin/album/delete/{id}', name: 'admin_album_delete')]
     public function delete(Album $album): Response
     {
-        if ($album) {
-            $this->em->remove($album);
-            $this->em->flush();
-        }
+        $this->em->remove($album);
+        $this->em->flush();
 
         return $this->redirectToRoute('admin_album_index');
     }

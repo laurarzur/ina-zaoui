@@ -2,7 +2,6 @@
 
 namespace App\Tests\Functional\Controller;
 
-use App\Repository\UserRepository;
 use App\Tests\Functional\FunctionalTestCase;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -116,7 +115,7 @@ class GuestControllerTest extends FunctionalTestCase
         $this->client->request('GET', '/admin/guest/delete/' . $id);
 
         $this->assertResponseRedirects('/admin/guest');
-        $this->assertNull(static::getContainer()->get(UserRepository::class)->find($id));
+        $this->assertNull($this->userRepo()->find($id));
     }
 
     /**

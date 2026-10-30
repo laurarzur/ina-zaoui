@@ -3,7 +3,7 @@
 namespace App\Tests\Functional\Controller;
 
 use App\Entity\Media;
-use App\Repository\MediaRepository;
+use App\Entity\User;
 use App\Tests\Functional\FunctionalTestCase;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -94,7 +94,11 @@ class MediaControllerTest extends FunctionalTestCase
 
         $media = $this->mediaRepo()->findOneBy(['title' => 'Ma photo']);
         $this->assertNotNull($media);
-        $this->assertSame($guest->getId(), $media->getUser()->getId());
+
+        $owner = $media->getUser();
+        $this->assertInstanceOf(User::class, $owner);
+
+        $this->assertSame($guest->getId(), $owner->getId());
     }
 
     public function testAdminDeletesAnyMedia(): void
@@ -128,14 +132,11 @@ class MediaControllerTest extends FunctionalTestCase
         $this->assertResponseStatusCodeSame(Response::HTTP_NOT_FOUND);
     }
 
-    private function mediaRepo(): MediaRepository
-    {
-        return static::getContainer()->get(MediaRepository::class);
-    }
-
     private function mediaOf(string $email): Media
     {
-        return static::getContainer()->get(MediaRepository::class)
-            ->findOneBy(['user' => $this->user($email)]);
+        $media = $this->mediaRepo()->findOneBy(['user' => $this->user($email)]);
+        $this->assertInstanceOf(Media::class, $media);
+
+        return $media;
     }
 }

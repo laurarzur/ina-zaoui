@@ -1,0 +1,57 @@
+name: CI
+ 
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+ 
+jobs:
+  tests:
+    name: Tests
+    runs-on: ubuntu-latest
+ 
+    env:
+      APP_ENV: test
+      DATABASE_URL: "mysql://root:root@127.0.0.1:3306/app?serverVersion=8.0.32&charset=utf8mb4"
+ 
+    services:
+      mysql:
+        image: mysql:8.0.32
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: app
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping -h 127.0.0.1 -proot"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=10
+ 
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+ 
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: "8.4"
+          extensions: ctype, iconv, intl, mbstring, pdo_mysql, xml
+          coverage: none
+          tools: composer:v2
+ 
+      - name: Installer dependencies
+        run: composer install --no-interaction --no-progress --prefer-dist
+ 
+      - name: PHPStan analysis
+        run: vendor/bin/phpstan analyse --no-progress --memory-limit=1G
+ 
+      - name: Prepare database
+        run: |
+          php bin/console doctrine:database:create --env=test --if-not-exists
+          php bin/console doctrine:migrations:migrate --env=test --no-interaction
+          php bin/console doctrine:fixtures:load --env=test --group=test --no-interaction
+ 
+      - name: Execute tests
+        run: php bin/phpunit --testdox

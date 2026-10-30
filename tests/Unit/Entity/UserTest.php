@@ -39,7 +39,7 @@ class UserTest extends TestCase
     {
         $unnamedUser = new User();
         $this->expectException(\Error::class);
-        $unnamedUser->getName();
+        $name = $unnamedUser->getName();
     }
 
     public function testGetUserIdentifier(): void
@@ -116,10 +116,5 @@ class UserTest extends TestCase
 
         $this->assertSame(hash("crc32c", "abc123"), $data[$cle]);
         $this->assertNotSame("abc123", $data[$cle]);
-    }
-
-    public function testGetId(): void
-    {
-        $this->assertNull($this->user->getId());
     }
 }

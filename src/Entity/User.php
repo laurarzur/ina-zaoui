@@ -18,7 +18,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    private ?int $id = null;
+    private int $id;
 
     #[ORM\Column(length: 180)]
     #[Assert\NotBlank()]
@@ -52,7 +52,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private Collection $medias;
 
     #[ORM\Column]
-    private ?bool $isBlocked = false;
+    private bool $isBlocked = false;
 
     public function __construct()
     {
@@ -83,6 +83,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     public function getUserIdentifier(): string
     {
+        if ($this->email === null || $this->email === '') {
+            throw new \LogicException("L'adresse e-mail ne peut pas être vide.");
+        }
         return (string) $this->email;
     }
 
@@ -129,7 +132,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function __serialize(): array
     {
         $data = (array) $this;
-        $data["\0" . self::class . "\0password"] = hash('crc32c', $this->password);
+        $data["\0" . self::class . "\0password"] = hash('crc32c', (string) $this->password);
 
         return $data;
     }

@@ -3,9 +3,7 @@
 namespace App\Tests\Functional\Controller;
 
 use App\Entity\Album;
-use App\Repository\AlbumRepository;
 use App\Tests\Functional\FunctionalTestCase;
-use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Response;
 
 class AlbumControllerTest extends FunctionalTestCase
@@ -78,7 +76,7 @@ class AlbumControllerTest extends FunctionalTestCase
     public function testEditAlbum(): void
     {
         $this->loginAdmin();
-        $album = $this->albumRepo()->findOneBy(['name' => 'Album 2']);
+        $album = $this->album('Album 2');
 
         $crawler = $this->client->request('GET', '/admin/album/update/' . $album->getId());
         $this->assertResponseIsSuccessful();
@@ -103,7 +101,7 @@ class AlbumControllerTest extends FunctionalTestCase
     public function testDeleteAlbum(): void
     {
         $this->loginAdmin();
-        $em = static::getContainer()->get(EntityManagerInterface::class);
+        $em = $this->entityManager();
 
         $album = new Album();
         $album->setName('Album à supprimer');
@@ -124,10 +122,5 @@ class AlbumControllerTest extends FunctionalTestCase
         $this->client->request('GET', '/admin/album/delete/-1');
 
         $this->assertResponseStatusCodeSame(Response::HTTP_NOT_FOUND);
-    }
-
-    private function albumRepo(): AlbumRepository
-    {
-        return static::getContainer()->get(AlbumRepository::class);
     }
 }

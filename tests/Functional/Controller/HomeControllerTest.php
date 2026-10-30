@@ -65,7 +65,9 @@ class HomeControllerTest extends FunctionalTestCase
         $crawler = $this->client->request('GET', '/portfolio');
         $link = $crawler->selectLink('Toutes');
 
-        $this->assertStringContainsString('active', $link->attr('class'));
+        $class = $link->attr('class');
+        $this->assertNotNull($class);
+        $this->assertStringContainsString('active', $class);
         $this->assertCount(3, $crawler->filter('a.btn'));
         $this->assertCount(10, $crawler->filter('.media-title'));
     }
