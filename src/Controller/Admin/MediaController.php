@@ -25,7 +25,7 @@ class MediaController extends AbstractController
     public function index(Request $request): Response
     {
         // Le numéro de page est récupéré pour la pagination
-        $page = $request->query->getInt('page', 1);
+        $page = max(1, $request->query->getInt('page', 1));
 
         $limit = 25;
         $criteria = [];
@@ -41,12 +41,13 @@ class MediaController extends AbstractController
             $limit,
             $limit * ($page - 1)
         );
-        $total = $this->repo->count([]);
+        $total = $this->repo->count($criteria);
 
         return $this->render('admin/media/index.html.twig', [
             'medias' => $medias,
             'total' => $total,
-            'page' => $page
+            'page' => $page,
+            'limit' => $limit
         ]);
     }
 
@@ -86,6 +87,10 @@ class MediaController extends AbstractController
     #[Route('/admin/media/delete/{id}', name: 'admin_media_delete')]
     public function delete(Media $media)
     {
+        if (!$this->isGranted('ROLE_ADMIN') && $media->getUser() !== $this->getUser()) {
+            throw $this->createAccessDeniedException();
+        }
+
         $this->em->remove($media);
         $this->em->flush();
 

@@ -58,9 +58,6 @@ class AlbumController extends AbstractController
     #[Route('/admin/album/update/{id}', name: 'admin_album_update')]
     public function update(Request $request, Album $album): Response
     {
-        if (!$album) {
-            return $this->redirectToRoute('admin_album_index');
-        }
         $form = $this->createForm(AlbumType::class, $album);
         $form->handleRequest($request);
 
